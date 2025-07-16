@@ -276,6 +276,7 @@ app.layout = html.Div([
                 columns=[
                     {"name": "Case Number", "id": "CaseNumber"},
                     {"name": "File Date", "id": "FileDate", "type": "datetime"},
+                    {"name": "Statute Description", "id": "Statute_Description"},
                     {"name": "Charge Description", "id": "ChargeOffenseDescription"},
                     {"name": "Case Type", "id": "Statute_CaseType"},
                     {"name": "Gender", "id": "Gender"},
@@ -330,24 +331,24 @@ def update_dashboard(selected_case_type, selected_gender, selected_race, selecte
     if selected_arrest != 'all' and 'Arrest_vs_NonArrest' in df.columns:
         filtered_df = filtered_df[filtered_df['Arrest_vs_NonArrest'] == selected_arrest]
     
-    # Top charge types chart
-    if 'ChargeOffenseDescription' in filtered_df.columns and len(filtered_df) > 0:
-        charge_counts = filtered_df['ChargeOffenseDescription'].value_counts().head(15)
-        if len(charge_counts) > 0:
+    # Top statute types chart (using Statute_Description instead of ChargeOffenseDescription)
+    if 'Statute_Description' in filtered_df.columns and len(filtered_df) > 0:
+        statute_counts = filtered_df['Statute_Description'].value_counts().head(15)
+        if len(statute_counts) > 0:
             charge_fig = px.bar(
-                x=charge_counts.values,
-                y=charge_counts.index,
+                x=statute_counts.values,
+                y=statute_counts.index,
                 orientation='h',
-                title="Top 15 Charge Types",
-                labels={'x': 'Number of Cases', 'y': 'Charge Description'},
-                color=charge_counts.values,
+                title="Top 15 Statute Types",
+                labels={'x': 'Number of Cases', 'y': 'Statute Description'},
+                color=statute_counts.values,
                 color_continuous_scale='Blues'
             )
             charge_fig.update_layout(showlegend=False, height=400)
         else:
-            charge_fig = px.bar(title="Top Charge Types (No data)")
+            charge_fig = px.bar(title="Top Statute Types (No data)")
     else:
-        charge_fig = px.bar(title="Top Charge Types (Column not found)")
+        charge_fig = px.bar(title="Top Statute Types (Column not found)")
     
     # Case type distribution
     if 'Statute_CaseType' in filtered_df.columns and len(filtered_df) > 0:
@@ -472,7 +473,7 @@ def update_dashboard(selected_case_type, selected_gender, selected_race, selecte
         agency_fig = px.bar(title="Agencies (Column not found)")
     
     # Table data - only include columns that exist
-    available_columns = [col for col in ['CaseNumber', 'FileDate', 'ChargeOffenseDescription', 'Statute_CaseType', 
+    available_columns = [col for col in ['CaseNumber', 'FileDate', 'Statute_Description', 'ChargeOffenseDescription', 'Statute_CaseType', 
                         'Gender', 'Race_Tier_1', 'Age_At_Offense', 'City_Clean', 'Lead_Agency'] if col in filtered_df.columns]
     
     if available_columns and len(filtered_df) > 0:
